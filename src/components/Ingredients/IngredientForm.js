@@ -6,12 +6,38 @@ import "./IngredientForm.css";
 const IngredientForm = React.memo((props) => {
   const [title, setEnteredTitle] = useState('');
   const [amount, setEnteredAmount] = useState('');
+  const [formIsActive, setFormIsActive] = useState(true)
+
+  const onChangeTitle = (event) => {
+    if (event.target.value.trim() !==0) {
+      setFormIsActive(false);
+      setEnteredTitle(event.target.value);
+    } else {
+      return;
+    }
+  }
+
+  const onChangeAmount = (event) => {
+    if (event.target.value.trim() !== 0) {
+      setFormIsActive(false);
+      setEnteredAmount(event.target.value);
+    } else {
+      return;
+    }
+  }
 
   const submitHandler = (event) => {
     event.preventDefault();
-    // setInputState((prevState) => {
 
-    // })
+    if (title.trim().length && amount.trim().length) {
+
+    props.onAddIngredients({title, amount}) //title:title
+
+    setEnteredTitle('');
+    setEnteredAmount('');
+    } else {
+      console.log('emty fields')
+    }
   };
 
   return (
@@ -24,11 +50,8 @@ const IngredientForm = React.memo((props) => {
               type="text"
               id="title"
               value={title}
-              onChange={(event) => {
-                setEnteredTitle(event.target.value);
-              }}
+              onChange={onChangeTitle}
             />{" "}
-            {/* [0] - the current state, [1] - function for update */}
           </div>
           <div className="form-control">
             <label htmlFor="amount">Amount</label>
@@ -36,13 +59,11 @@ const IngredientForm = React.memo((props) => {
               type="number"
               id="amount"
               value={amount}
-              onChange={(event) => {
-                setEnteredAmount( event.target.value);
-              }}
+              onChange={onChangeAmount}
             />
           </div>
           <div className="ingredient-form__actions">
-            <button type="submit">Add Ingredient</button>
+            <button type="submit" disabled ={formIsActive} >Add Ingredient</button>
           </div>
         </form>
       </Card>

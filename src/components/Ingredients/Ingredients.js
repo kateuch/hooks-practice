@@ -17,8 +17,8 @@ const Ingredients = () => {
           amount: responseData[key].amount
         });
       };
-      setUserIngredients(loadedIngredients);
-      })
+     setUserIngredients(loadedIngredients);
+      });
     }, [])  //it runs only once, after the first render
 
 
@@ -40,6 +40,10 @@ const Ingredients = () => {
       );
   };
 
+  const onFilterHandler = (filteredIngredients) => {
+    setUserIngredients(filteredIngredients)
+  }
+
   const removeIngredientHandler = (id) => {
     setUserIngredients((prevState) =>
       prevState.filter((ingredient) => ingredient.id !== id)
@@ -51,7 +55,7 @@ const Ingredients = () => {
       <IngredientForm onAddIngredients={addIngredient} />
 
       <section>
-        <Search />
+        <Search onFilterIngredients={onFilterHandler}/>
         <IngredientList
           ingredients={userIngredients}
           onRemoveItem={removeIngredientHandler}

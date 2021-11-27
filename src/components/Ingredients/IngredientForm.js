@@ -4,6 +4,7 @@ import Card from "../UI/Card";
 import "./IngredientForm.css";
 
 const IngredientForm = React.memo((props) => {
+  console.log('rendering form')
   const [title, setEnteredTitle] = useState('');
   const [amount, setEnteredAmount] = useState('');
   const [formIsActive, setFormIsActive] = useState(true)
@@ -30,6 +31,7 @@ const IngredientForm = React.memo((props) => {
     event.preventDefault();
 
     if (title.trim().length && amount.trim().length) {
+
 
     props.onAddIngredients({title, amount}) //title:title
 
@@ -63,7 +65,7 @@ const IngredientForm = React.memo((props) => {
             />
           </div>
           <div className="ingredient-form__actions">
-            <button type="submit" disabled ={formIsActive} >Add Ingredient</button>
+            <button type="submit" disabled={formIsActive} >Add Ingredient</button>
           </div>
         </form>
       </Card>

@@ -4,10 +4,10 @@ import IngredientForm from "./IngredientForm";
 import Search from "./Search";
 
 const Ingredients = () => {
-  console.log('rendering ingredients')
+  console.log("rendering ingredients");
   const [userIngredients, setUserIngredients] = useState([]);
 
-//fetching of the list of ingredient in Search component
+  //fetching of the list of ingredient in Search component
 
   // useEffect(() => {
   //   fetch("https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json").then(response=>response.json())
@@ -24,13 +24,15 @@ const Ingredients = () => {
   //     });
   //   }, [])  //it runs only once, after the first render
 
-
   const addIngredient = (ingredient) => {
-    fetch("https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json", {
-      method: "POST",
-      body: JSON.stringify( ingredient ),
-      headers: { 'Content-Type': 'application/json' }
-    })
+    fetch(
+      "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json",
+      {
+        method: "POST",
+        body: JSON.stringify(ingredient),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
       .then((response) => {
         return response.json();
       })
@@ -43,14 +45,24 @@ const Ingredients = () => {
       );
   };
 
-  const onFilterHandler = useCallback((filteredIngredients) => {
-    setUserIngredients(filteredIngredients)
-  }, [setUserIngredients])
+  const onFilterHandler = useCallback(
+    (filteredIngredients) => {
+      setUserIngredients(filteredIngredients);
+    },
+    [setUserIngredients]
+  );
 
   const removeIngredientHandler = (id) => {
-    setUserIngredients((prevState) =>
-      prevState.filter((ingredient) => ingredient.id !== id)
-    );
+    fetch(
+      `https://ingredients-form-default-rtdb.firebaseio.com/ingredients/${id}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      setUserIngredients((prevState) =>
+        prevState.filter((ingredient) => ingredient.id !== id)
+      );
+    });
   };
 
   return (
@@ -58,7 +70,7 @@ const Ingredients = () => {
       <IngredientForm onAddIngredients={addIngredient} />
 
       <section>
-        <Search onFilterIngredients={onFilterHandler}/>
+        <Search onFilterIngredients={onFilterHandler} />
         <IngredientList
           ingredients={userIngredients}
           onRemoveItem={removeIngredientHandler}

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-
 import Card from "../UI/Card";
 import "./Search.css";
 
@@ -8,7 +7,9 @@ const Search = React.memo((props) => {
   const [enteredFilter, setInteredFilter] = useState("");
   const inputRef = useRef();
 
-  useEffect(() => { //the first render this does execute
+  useEffect(() => {
+    //the first render this does execute
+
     const timer = setTimeout(() => {
       if (enteredFilter === inputRef.current.value) {
         console.log("rendering filter");
@@ -22,6 +23,7 @@ const Search = React.memo((props) => {
         )
           .then((response) => response.json())
           .then((responseData) => {
+
             const loadedIngredients = [];
             for (const key in responseData) {
               loadedIngredients.push({
@@ -35,8 +37,9 @@ const Search = React.memo((props) => {
       }
     }, 500);
     return () => {
+      //the first render this does not execute
       clearTimeout(timer);
-    } //the first render this does not execute
+    };
   }, [enteredFilter, onFilterIngredients, inputRef]);
 
   const onChangeFilter = (event) => {

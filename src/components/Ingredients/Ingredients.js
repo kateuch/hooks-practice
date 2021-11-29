@@ -1,8 +1,9 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useReducer, useMemo, useEffect } from "react";
 import IngredientList from "./IngredientList";
 import IngredientForm from "./IngredientForm";
 import Search from "./Search";
 import ErrorModal from "../UI/ErrorModal";
+import useHttp from "../hooks/http";
 
 const ingredientReducer = (state, action) => {
   switch (action.type) {
@@ -17,91 +18,79 @@ const ingredientReducer = (state, action) => {
   }
 };
 
-const httpReducer = (prevState, action) => {
-  switch (action.type) {
-    case "SEND":
-      return { loading: true, error: null };
-    case "RESPONSE":
-      return { ...prevState, loading: false };
-    case "ERROR":
-      return { loading: false, error: action.error };
-      case "CLEAR_ERROR":
-        return {...prevState, error: null}
-    default:
-      throw new Error("Error");
-  }
-};
-
 const Ingredients = () => {
   console.log("rendering ingredients");
-  const [httpState, dispatchHttp] = useReducer(httpReducer, {
-    loading: false,
-    error: null,
-  });
+
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
   //fetching of the list of ingredient in Search component
 
-  const addIngredient = (ingredient) => {
-    dispatchHttp({ type: "SEND" });
-    fetch(
-      "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json",
-      {
-        method: "POST",
-        body: JSON.stringify(ingredient),
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then((response) => {
-        dispatchHttp({ type: "SEND" });
-        return response.json();
-      })
-      .then((responseData) =>
-        //...ingredients takes all key value
-        dispatch({ type: "ADD", ingredient })
-      )
-      .catch((error) => {
-        dispatchHttp({type: 'ERROR', error: 'Failed.'});
-      });
-  };
+  const { isLoading, data, error, sendRequest, reqExtra, reqIdentifer, clear } =
+    useHttp;
 
-  const onFilterHandler = useCallback((filteredIngredients) => {
-    dispatch({ type: "SET", ingredients: filteredIngredients });
+  //updating Ingredients component
+  useEffect(() => {
+    if (!isLoading && !error && reqIdentifer === "DELETE") {
+      dispatch({ type: "DELETE", id: reqExtra });
+    } else if (!isLoading && !error && reqIdentifer === "ADD") {
+      dispatch({
+        type: "ADD",
+        ingredient: { id: data.name, ...reqExtra },
+      });
+    }
+  }, [data, reqExtra, reqIdentifer, isLoading, error]);
+
+  const addIngredient = useCallback((ingredient) => {
+    sendRequest(
+      "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json",
+      "POST",
+      JSON.stringify(ingredient),
+      "ADD"
+    );
   }, []);
 
-  const removeIngredientHandler = (id) => {
-    dispatchHttp({ type: "SEND" });
-    fetch(
-      `https://ingredients-form-default-rtdb.firebaseio.com/ingredients/${id}.json`,
-      {
-        method: "DELETE",
-      }
-    )
-      .then((response) => {
-        dispatchHttp({ type: "RESPONSE" });
-        dispatch({ type: "DELETE", id });
-      })
-      .catch((error) => {
-        dispatchHttp({type: 'ERROR', error: 'Failed.'});
+  const onFilterHandler = useCallback(
+    (filteredIngredients) => {
+      dispatch({ type: "SET", ingredients: filteredIngredients });
+    },
+    [sendRequest]
+  );
 
-      });
-  };
-  const clearError = () => {
-    dispatchHttp({ type: "CLEAR_ERROR"});
-  };
+  const removeIngredientHandler = useCallback(
+    (id) => {
+      sendRequest(
+        `https://ingredients-form-default-rtdb.firebaseio.com/ingredients/${id}.json`,
+        "DELETE",
+        null,
+        id,
+        "DELETE"
+      );
+    },
+    [sendRequest]
+  );
+
+  const clearError = useCallback(() => {
+    clear();
+  }, []);
+
+  const ingredientList = useMemo(() => {
+    return (
+      <IngredientList
+        loading={isLoading}
+        ingredients={userIngredients}
+        onRemoveItem={removeIngredientHandler}
+      />
+    );
+  }, [userIngredients, removeIngredientHandler]);
 
   return (
     <div className="App">
-      {httpState.error && <ErrorModal onClose={clearError}>{httpState.error}</ErrorModal>}
+      {error && <ErrorModal onClose={clearError}>{error}</ErrorModal>}
 
-      <IngredientForm onAddIngredients={addIngredient} loading={httpState.loading} />
+      <IngredientForm onAddIngredients={addIngredient} loading={isLoading} />
 
       <section>
-        <Search onFilterIngredients={onFilterHandler} loading={httpState.loading} />
-        <IngredientList
-          loading={httpState.loading}
-          ingredients={userIngredients}
-          onRemoveItem={removeIngredientHandler}
-        />
+        <Search onFilterIngredients={onFilterHandler} />
+        {ingredientList}
       </section>
     </div>
   );

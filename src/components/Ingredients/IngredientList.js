@@ -3,7 +3,8 @@ import LoadingIndicator from '../UI/LoadingIndicator';
 
 import './IngredientList.css';
 
-const IngredientList = props => {
+const IngredientList = props => {  //React.memo also possible to use
+  console.log('ingr list render')
   return (
 
     <section className="ingredient-list">

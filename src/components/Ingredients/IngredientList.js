@@ -10,7 +10,7 @@ const IngredientList = props => {  //React.memo also possible to use
     <section className="ingredient-list">
 
       <h2>Loaded Ingredients</h2>
-      {props.loading && <LoadingIndicator />}
+      {props.loading ? <span>Loading...</span> :
       <ul>
         {props.ingredients.map(ig => (
           <li key={ig.id} onClick={props.onRemoveItem.bind(this, ig.id)}>
@@ -19,6 +19,7 @@ const IngredientList = props => {  //React.memo also possible to use
           </li>
         ))}
       </ul>
+}
     </section>
   );
 };

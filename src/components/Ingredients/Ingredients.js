@@ -25,7 +25,7 @@ const Ingredients = () => {
   //fetching of the list of ingredient in Search component
 
   const { isLoading, data, error, sendRequest, reqExtra, reqIdentifer, clear } =
-    useHttp;
+    useHttp();
 
   //updating Ingredients component
   useEffect(() => {
@@ -44,9 +44,10 @@ const Ingredients = () => {
       "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json",
       "POST",
       JSON.stringify(ingredient),
+      ingredient,
       "ADD"
     );
-  }, []);
+  }, [sendRequest]);
 
   const onFilterHandler = useCallback(
     (filteredIngredients) => {

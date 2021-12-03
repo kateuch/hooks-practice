@@ -10,7 +10,7 @@ const authCtx = useContext(AuthContext);
 
 let content = <Auth />
 if (authCtx.isAuth) {
-  content = <Ingredients/>
+  content = <Ingredients/>;
 }
   return (
     content

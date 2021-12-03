@@ -21,13 +21,10 @@ const Search = React.memo((props) => {
             ? ""
             : `?orderBy="title"&startAt="${enteredFilter}"&endtAt="${enteredFilter}"&print=pretty`;
         sendRequest(
-          "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json" + query,
-        'GET',
-        null,
-        null,
-        null
+          "https://ingredients-form-default-rtdb.firebaseio.com/ingredients.json" +
+            query,
+          "GET"
         );
-
       }
     }, 500);
     return () => {
@@ -38,28 +35,28 @@ const Search = React.memo((props) => {
 
   useEffect(() => {
     if (!isLoading && !error && data) {
-    const loadedIngredients = [];
-    for (const key in data) {
-      loadedIngredients.push({
-        id: key,
-        title: data[key].title,
-        amount: data[key].amount,
-      });
+      const loadedIngredients = [];
+      for (const key in data) {
+        loadedIngredients.push({
+          id: key,
+          title: data[key].title,
+          amount: data[key].amount,
+        });
+      }
+      onFilterIngredients(loadedIngredients);
     }
-    onFilterIngredients(loadedIngredients);
-  }
-  }, [isLoading, error, data, onFilterIngredients])
+  }, [isLoading, error, data, onFilterIngredients]);
 
   const onChangeFilter = (event) => {
     setInteredFilter(event.target.value);
   };
   return (
     <section className="search">
-      {error && <ErrorModal onClick={clear}>{error}</ErrorModal>}
+      {error && <ErrorModal onClose={clear}>{error}</ErrorModal>}
       <Card>
         <div className="search-input">
           <label>Filter by Title</label>
-          {isLoading && <span>...Loading</span>}
+          {isLoading && <span>Loading...</span>}
           <input
             ref={inputRef}
             type="text"

@@ -8,7 +8,7 @@ const initialState = {
   indentifier: null,
 };
 
-const httpReducer = (currentState = initialState, action) => {
+const httpReducer = (currentState , action) => {
   switch (action.type) {
     case "SEND":
       return {
@@ -28,7 +28,7 @@ const httpReducer = (currentState = initialState, action) => {
     case "ERROR":
       return { loading: false, error: action.error };
     case "CLEAR_ERROR":
-      return { initialState };
+      return  initialState ;
     default:
       throw new Error("Ooops!");
   }
@@ -37,9 +37,7 @@ const httpReducer = (currentState = initialState, action) => {
 const useHttp = () => {
   const [httpState, dispatchHttp] = useReducer(httpReducer, initialState);
 
-  const clear = useCallback(() => {
-    dispatchHttp({ type: "CLEAR" });
-  }, []);
+  const clear = useCallback(() => dispatchHttp({ type: 'CLEAR_ERROR' }), []);
 
   const sendRequest = useCallback(
     (url, method, body, reqExtra, reqIdentifier) => {
@@ -73,7 +71,7 @@ const useHttp = () => {
     sendRequest: sendRequest,
     reqExtra: httpState.extra,
     reqIdentifer: httpState.identifier,
-    clear: clear(),
+    clear: clear,
   };
 };
 
